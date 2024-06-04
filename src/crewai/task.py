@@ -273,14 +273,15 @@ class Task(BaseModel):
                 if not self._is_gpt(llm):
                     model_schema = PydanticSchemaParser(model=model).get_schema()  # type: ignore # Argument "model" to "PydanticSchemaParser" has incompatible type "type[BaseModel] | None"; expected "type[BaseModel]"
                     instructions = f"{instructions}\n\nThe json should have the following structure, with the following keys:\n{model_schema}"
+                    print(f"DEBUG to pydantic:",model_schema,instructions)
 
                 converter = Converter(
                     llm=llm, text=result, model=model, instructions=instructions
                 )
             except Exception as e:
                 print("error attempting to use default crewai pydantic converter approach")
-                if not self._is_gpt(llm):
-                    model_schema = model.schema_json(indent=2)  # type: ignore # Argument "model" to "PydanticSchemaParser" has incompatible type "type[BaseModel] | None"; expected "type[BaseModel]"
+                if not self._is_gpt(llm) and self.output_pydantic:
+                    model_schema = self.output_pydantic.schema_json(indent=2)  # type: ignore # Argument "model" to "PydanticSchemaParser" has incompatible type "type[BaseModel] | None"; expected "type[BaseModel]"
                     print(f"json model_schema",model_schema)
                     instructions = f"{instructions}\n\nThe json should have the following structure, with the following keys:\n{model_schema}"
                     print("instructions (non-gpt):",instructions)

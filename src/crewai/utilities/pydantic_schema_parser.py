@@ -1,7 +1,6 @@
 from typing import Type, get_args, get_origin
-
-from pydantic import BaseModel
-
+from pydantic import BaseModel, Field
+from typing import List, Optional, Literal
 
 class PydanticSchemaParser(BaseModel):
     model: Type[BaseModel]
@@ -15,29 +14,31 @@ class PydanticSchemaParser(BaseModel):
         """
         return self._get_model_schema(self.model)
 
-    def _get_model_schema(self, model, depth=0) -> str:
+    def _get_model_schema(self, model: Type[BaseModel], depth=0) -> str:
         lines = []
-        for field_name, field in model.model_fields.items():
-            field_type_str = self._get_field_type(field, depth + 1)
+        for field_name, field_info in model.__fields__.items():
+            field_type_str = self._get_field_type(field_info.outer_type_, depth + 1)
             lines.append(f"{' ' * 4 * depth}- {field_name}: {field_type_str}")
 
         return "\n".join(lines)
 
-    def _get_field_type(self, field, depth) -> str:
-        field_type = field.annotation
-        if get_origin(field_type) is list:
-            list_item_type = get_args(field_type)[0]
-            if isinstance(list_item_type, type) and issubclass(
-                list_item_type, BaseModel
-            ):
-                nested_schema = self._get_model_schema(list_item_type, depth + 1)
+    def _get_field_type(self, field_type, depth) -> str:
+        origin = get_origin(field_type)
+        args = get_args(field_type)
+
+        if origin is list:  # This covers cases like List[x]
+            item_type = args[0]
+            if isinstance(item_type, type) and issubclass(item_type, BaseModel):
+                nested_schema = self._get_model_schema(item_type, depth + 1)
                 return f"List[\n{nested_schema}\n{' ' * 4 * depth}]"
             else:
-                return f"List[{list_item_type.__name__}]"
-        elif issubclass(field_type, BaseModel):
-            try:
-                return f"\n{self._get_model_schema(field_type, depth)}"
-            except Exception as e:
-                print(f"Error in issubclass: {e}")
-        else:
+                return f"List[{item_type.__name__}]"
+        elif origin is Union:  # This covers Optional[x] and other unions
+            types = ", ".join([self._get_field_type(arg, depth) for arg in args])
+            return f"Union[{types}]"
+        elif isinstance(field_type, type) and issubclass(field_type, BaseModel):
+            return f"\n{self._get_model_schema(field_type, depth)}"
+        elif isinstance(field_type, type):
             return field_type.__name__
+        else:
+            return str(field_type)  # Fallback for other complex types
