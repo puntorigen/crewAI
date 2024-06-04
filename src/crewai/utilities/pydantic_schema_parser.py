@@ -1,6 +1,6 @@
 from typing import Type, get_args, get_origin
 
-from pydantic import BaseModel
+from pydantic.v1 import BaseModel
 
 
 class PydanticSchemaParser(BaseModel):
