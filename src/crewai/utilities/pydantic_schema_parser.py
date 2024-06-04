@@ -1,6 +1,6 @@
 from typing import Type, get_args, get_origin
 
-from pydantic.v1 import BaseModel
+from pydantic import BaseModel
 
 
 class PydanticSchemaParser(BaseModel):
@@ -35,6 +35,9 @@ class PydanticSchemaParser(BaseModel):
             else:
                 return f"List[{list_item_type.__name__}]"
         elif issubclass(field_type, BaseModel):
-            return f"\n{self._get_model_schema(field_type, depth)}"
+            try:
+                return f"\n{self._get_model_schema(field_type, depth)}"
+            except Exception as e:
+                print(f"Error in issubclass: {e}")
         else:
             return field_type.__name__
