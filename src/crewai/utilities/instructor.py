@@ -31,7 +31,7 @@ class Instructor(BaseModel):
 
         self._client = instructor.patch(
             self.llm.client._client,
-            mode=instructor.Mode.TOOLS,
+            mode=instructor.Mode.JSON,
         )
         return self
 
