@@ -38,7 +38,8 @@ class Converter(BaseModel):
             if self._is_gpt:
                 return self._create_instructor().to_pydantic()
             else:
-                return self._create_chain().invoke({})
+                return self._create_instructor().to_pydantic()
+                #return self._create_chain().invoke({})
         except Exception as e:
             if current_attempt < self.max_attemps:
                 return self.to_pydantic(current_attempt + 1)
@@ -52,7 +53,8 @@ class Converter(BaseModel):
             if self._is_gpt:
                 return self._create_instructor().to_json()
             else:
-                return json.dumps(self._create_chain().invoke({}).model_dump())
+                return self._create_instructor().to_json()
+                #return json.dumps(self._create_chain().invoke({}).model_dump())
         except Exception:
             if current_attempt < self.max_attemps:
                 return self.to_json(current_attempt + 1)
