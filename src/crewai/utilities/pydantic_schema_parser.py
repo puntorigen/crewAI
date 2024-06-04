@@ -16,8 +16,7 @@ class PydanticSchemaParser(BaseModel):
         lines = []
         indent = ' ' * 4 * (depth + 1)
         for field_name, field_info in model.model_fields.items():
-            print(f"DEBUG field_name: {field_name}, field_info:",field_info)
-            field_type = field_info.type_
+            field_type = field_info.annotation  # Use annotation to get the field type
             field_type_str = self._get_field_type(field_type, depth + 1)
             lines.append(f"{indent}'{field_name}': {field_type_str}")
 
