@@ -34,7 +34,7 @@ class Instructor(BaseModel):
         print(f"instructor.. is gpt.. {is_gpt}")
         self._client = instructor.patch(
             self.llm.client._client,
-            mode=(instructor.Mode.JSON if is_gpt else instructor.Mode.TOOLS),
+            mode=(instructor.Mode.TOOLS if is_gpt else instructor.Mode.JSON),
         )
         return self
 
