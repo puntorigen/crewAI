@@ -2,6 +2,7 @@ from typing import Any, Optional, Type
 
 import instructor
 from pydantic import BaseModel, Field, PrivateAttr, model_validator
+from langchain_openai import ChatOpenAI
 
 
 class Instructor(BaseModel):
@@ -29,9 +30,10 @@ class Instructor(BaseModel):
         if self.agent and not self.llm:
             self.llm = self.agent.function_calling_llm or self.agent.llm
 
+        is_gpt = isinstance(self.llm, ChatOpenAI) and self.llm.openai_api_base is None
         self._client = instructor.patch(
             self.llm.client._client,
-            mode=instructor.Mode.JSON,
+            mode=(instructor.Mode.JSON if is_gpt else instructor.Mode.TOOLS),
         )
         return self
 
