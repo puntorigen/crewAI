@@ -241,47 +241,6 @@ class Crew(BaseModel):
         del task_config["agent"]
         return Task(**task_config, agent=task_agent)
 
-    async def kickoffAsync(self, inputs: Optional[Dict[str, Any]] = {}) -> str:
-        """Starts the crew to work on its assigned tasks."""
-        self._execution_span = self._telemetry.crew_execution_span(self)
-        self._interpolate_inputs(inputs)  # type: ignore # Argument 1 to "_interpolate_inputs" of "Crew" has incompatible type "dict[str, Any] | None"; expected "dict[str, Any]"
-        self._set_tasks_callbacks()
-
-        i18n = I18N(prompt_file=self.prompt_file)
-
-        for agent in self.agents:
-            agent.i18n = i18n
-            agent.crew = self
-
-            if not agent.function_calling_llm:
-                agent.function_calling_llm = self.function_calling_llm
-            if not agent.step_callback:
-                agent.step_callback = self.step_callback
-
-            await agent.create_agent_executor()
-
-        metrics = []
-
-        if self.process == Process.sequential:
-            result = self._run_sequential_process()
-        elif self.process == Process.hierarchical:
-            result, manager_metrics = self._run_hierarchical_process()  # type: ignore # Unpacking a string is disallowed
-            metrics.append(manager_metrics)  # type: ignore # Cannot determine type of "manager_metrics"
-
-        else:
-            raise NotImplementedError(
-                f"The process '{self.process}' is not implemented yet."
-            )
-
-        metrics = metrics + [
-            agent._token_process.get_summary() for agent in self.agents
-        ]
-        self.usage_metrics = {
-            key: sum([m[key] for m in metrics if m is not None]) for key in metrics[0]
-        }
-
-        return result
-
     def kickoff(self, inputs: Optional[Dict[str, Any]] = {}) -> str:
         """Starts the crew to work on its assigned tasks."""
         self._execution_span = self._telemetry.crew_execution_span(self)
