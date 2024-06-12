@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "crewai"
-version = "0.30.15"
+version = "0.30.16"
 description = "Cutting-edge framework for orchestrating role-playing, autonomous AI agents. By fostering collaborative intelligence, CrewAI empowers agents to work together seamlessly, tackling complex tasks."
 authors = ["Joao Moura <joao@crewai.com>","Pablo Schaffner <pablo@puntorigen.com>"]
 readme = "README.md"
@@ -9,7 +9,7 @@ packages = [{ include = "crewai", from = "src" }]
 [tool.poetry.urls]
 Homepage = "https://crewai.com"
 Documentation = "https://github.com/joaomdmoura/CrewAI/wiki/Index"
-Repository = "https://github.com/joaomdmoura/crewai"
+Repository = "https://github.com/puntorigen/crewai"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<=3.13"

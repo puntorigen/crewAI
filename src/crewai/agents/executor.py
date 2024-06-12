@@ -99,7 +99,7 @@ class CrewAgentExecutor(AgentExecutor):
                 )
                 self.crew._entity_memory.save(entity_memory)
 
-    def _call(
+    async def _call(
         self,
         inputs: Dict[str, str],
         run_manager: Optional[CallbackManagerForChainRun] = None,
@@ -134,7 +134,7 @@ class CrewAgentExecutor(AgentExecutor):
                 )
 
                 if self.step_callback:
-                    self.step_callback(next_step_output)
+                    await self.step_callback(next_step_output)
 
                 if isinstance(next_step_output, AgentFinish):
                     # Creating long term memory

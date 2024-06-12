@@ -256,9 +256,9 @@ class Crew(BaseModel):
             if not agent.function_calling_llm:
                 agent.function_calling_llm = self.function_calling_llm
             if not agent.step_callback:
-                agent.step_callback = await self.step_callback
+                agent.step_callback = self.step_callback
 
-            agent.create_agent_executor()
+            await agent.create_agent_executor()
 
         metrics = []
 

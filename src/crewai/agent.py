@@ -268,7 +268,7 @@ class Agent(BaseModel):
             self._rpm_controller = rpm_controller
             self.create_agent_executor()
 
-    def create_agent_executor(self, tools=None) -> None:
+    async def create_agent_executor(self, tools=None) -> None:
         """Create an agent executor for the agent.
 
         Returns:
@@ -329,7 +329,7 @@ class Agent(BaseModel):
 
         bind = self.llm.bind(stop=stop_words)
         inner_agent = agent_args | execution_prompt | bind | CrewAgentParser(agent=self)
-        self.agent_executor = CrewAgentExecutor(
+        self.agent_executor = await CrewAgentExecutor(
             agent=RunnableAgent(runnable=inner_agent), **executor_args
         )
 
