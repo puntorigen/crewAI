@@ -31,7 +31,7 @@ class Instructor(BaseModel):
             self.llm = self.agent.function_calling_llm or self.agent.llm
 
         is_gpt = isinstance(self.llm, ChatOpenAI) and self.llm.openai_api_base is None
-        print(f"instructor.. is gpt.. {is_gpt}")
+        #print(f"instructor.. is gpt.. {is_gpt}")
         self._client = instructor.patch(
             self.llm.client._client,
             mode=(instructor.Mode.TOOLS if is_gpt else instructor.Mode.JSON),
